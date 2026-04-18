@@ -70,7 +70,7 @@ pr-code-review/
 
 `pr-code-review/` works great with [receiving-code-review](https://github.com/obra/superpowers/tree/main/skills/receiving-code-review) from superpowers -- it teaches the agent how to critically evaluate review feedback before blindly applying suggestions.
 
-<img width="837" height="361" alt="Screenshot 2026-04-18 at 12 15 04 AM" src="https://github.com/user-attachments/assets/4147c9ac-d4cc-4553-a806-482560810fe5" />
+![pr-code-review demo](./assets/pr-code-review.png)
 
 
 ### ship
