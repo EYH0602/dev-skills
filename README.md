@@ -34,6 +34,13 @@ Skills describe review methodology in plain language — no platform-specific AP
 
 ---
 
+## Prerequisites
+
+All skills in this repo build on two skill collections that should be installed first:
+
+- **[gstack](https://github.com/garrytan/gstack)** -- plan review pipeline (`/plan-eng-review`, `/plan-ceo-review`, `/autoplan`), shipping workflow, and operational tooling.
+- **[superpowers](https://github.com/obra/superpowers)** -- subagent-driven development methodology (`subagent-driven-development`, `writing-plans`, `finishing-a-development-branch`), code review, and TDD workflows.
+
 ## Skills
 
 ### pr-code-review
@@ -61,7 +68,22 @@ pr-code-review/
     └── guidelines-compliance.md      # Project rules compliance prompt
 ```
 
-`pr-code-review/` works great with [receiving-code-review](https://github.com/obra/superpowers/tree/main/skills/receiving-code-review) from superpowers — it teaches the agent how to critically evaluate review feedback before blindly applying suggestions.
+`pr-code-review/` works great with [receiving-code-review](https://github.com/obra/superpowers/tree/main/skills/receiving-code-review) from superpowers -- it teaches the agent how to critically evaluate review feedback before blindly applying suggestions.
+
+### ship
+
+Execute an approved plan through subagent-driven development. Dispatches a fresh subagent per task with two-stage review (spec compliance, then code quality), commits each completed step for traceability, and opens a PR when done.
+
+Requires engineering review to be cleared before execution (see [Prerequisites](#prerequisites)).
+
+```
+ship/
+├── SKILL.md                              # Orchestration workflow
+└── references/
+    ├── implementer-prompt.md             # Subagent dispatch template
+    ├── spec-reviewer-prompt.md           # Spec compliance reviewer
+    └── code-quality-reviewer-prompt.md   # Code quality reviewer
+```
 
 ## Installation
 
