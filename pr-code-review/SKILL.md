@@ -1,7 +1,6 @@
 ---
 name: pr-code-review
 description: Use when reviewing pull requests, before merging code, or when asked to review PR changes. Dispatches parallel specialized reviewers for bug detection, error handling, type design, test coverage, comment quality, and guidelines compliance.
-compatibility: Requires git and access to PR diffs. Works with any agent that supports subagent dispatching.
 ---
 
 # PR Code Review

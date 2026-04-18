@@ -75,3 +75,7 @@ cp -r pr-code-review ~/.claude/skills/
 ```
 
 Skills activate automatically based on their description triggers.
+
+## Pairs well with
+
+`pr-code-review/` works great with [receiving-code-review](https://github.com/obra/superpowers/tree/main/skills/receiving-code-review) from superpowers — it teaches the agent how to critically evaluate review feedback before blindly applying suggestions.
