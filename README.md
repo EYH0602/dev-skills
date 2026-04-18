@@ -70,6 +70,9 @@ pr-code-review/
 
 `pr-code-review/` works great with [receiving-code-review](https://github.com/obra/superpowers/tree/main/skills/receiving-code-review) from superpowers -- it teaches the agent how to critically evaluate review feedback before blindly applying suggestions.
 
+<img width="837" height="361" alt="Screenshot 2026-04-18 at 12 15 04 AM" src="https://github.com/user-attachments/assets/4147c9ac-d4cc-4553-a806-482560810fe5" />
+
+
 ### ship
 
 Execute an approved plan through subagent-driven development. Dispatches a fresh subagent per task with two-stage review (spec compliance, then code quality), commits each completed step for traceability, and opens a PR when done.
