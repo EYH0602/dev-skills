@@ -61,14 +61,17 @@ pr-code-review/
 
 ## Installation
 
-Copy or symlink skills into your agent's skill directory:
+Install with [skillshub](https://github.com/EYH0602/skillshub), which syncs skills across all your agents (Claude Code, Codex, Cursor, etc.):
 
 ```bash
-# Claude Code
-cp -r pr-code-review ~/.claude/skills/
+skillshub add https://github.com/EYH0602/code-review/tree/main/pr-code-review
+skillshub link
+```
 
-# Or symlink
-ln -s $(pwd)/pr-code-review ~/.claude/skills/pr-code-review
+Or install manually:
+
+```bash
+cp -r pr-code-review ~/.claude/skills/
 ```
 
 Skills activate automatically based on their description triggers.
