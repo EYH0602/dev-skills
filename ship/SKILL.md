@@ -5,7 +5,9 @@ description: >
   each completed step for traceability, and opening a PR when done. Use when the user has
   a reviewed plan committed in the repo and says "ship", "build the plan", "execute the plan",
   "implement the plan", or wants to go from approved plan to pull request. Also use when
-  the user references a plan file and wants it implemented with quality gates.
+  the user references a plan file (e.g. `/ship path/to/plan.md`) and wants it implemented
+  with quality gates. When a file path argument is provided, ALWAYS treat it as a plan to
+  implement -- never as code to ship directly.
 ---
 
 # Ship: Plan to Pull Request
@@ -16,8 +18,18 @@ git history reads like the plan. Open a PR when all tasks pass.
 
 **Core loop:** For each task: implement -> spec review -> quality review -> commit. Then PR.
 
+## Arguments
+
+`/ship [path/to/plan.md]`
+
+- **No argument**: Search the repo for a plan file (see Step 1)
+- **File path argument**: Read the file at that path and implement it as a plan. The argument
+  is ALWAYS a plan to implement, not a file to ship. Read the file, extract the tasks, and
+  execute the implementation workflow below.
+
 ## When to Use
 
+- The user invokes `/ship path/to/plan.md` -- implement the plan at that path
 - A plan file exists in the repo (or the user points you at one)
 - The plan has been reviewed and approved (by humans, gstack reviews, or equivalent)
 - The user wants to go from "approved plan" to "shipped PR"
@@ -88,7 +100,8 @@ digraph ship {
 ### Step 1: Find and Validate the Plan
 
 Locate the plan file. Check in order:
-1. The user specified a file path -- use it
+1. **The user provided a file path as an argument** (e.g. `/ship plans/auth.md`) -- use it
+   directly. Read the file and proceed. This is a plan to implement, not a file to commit or PR.
 2. Look for recently committed plan files: `git log --diff-filter=A --name-only --format="" -20 | grep -iE 'plan|design|spec|rfc'`
 3. Search the repo: files matching `*plan*.md`, `*design*.md`, `*rfc*.md`, `*spec*.md`
 
