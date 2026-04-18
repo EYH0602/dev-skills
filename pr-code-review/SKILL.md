@@ -14,6 +14,7 @@ Comprehensive pull request review using parallel specialized reviewers. Each rev
 - Reviewing a pull request before merge
 - When asked to "review this PR" or "code review"
 - Before approving code for production
+- Re-reviewing a PR after the author addresses review comments
 
 **Don't use for:**
 - Reviewing local uncommitted changes (review the diff directly instead)
@@ -144,6 +145,119 @@ When the review targets a GitHub PR, submit a formal review — not a plain comm
 - **Request Changes** if any critical (90-100) or important (75-89) findings exist
 
 Use your platform's PR review API (e.g., `gh api` for GitHub CLI, or equivalent) to post the review with inline comments and a verdict in a single review submission. Do not post findings as individual standalone comments.
+
+## Re-Review: Resolving Addressed Comments
+
+When re-reviewing a PR (the author pushed fixes and re-requested review), resolve inline review threads that have been addressed before running the normal review flow on new changes.
+
+### Re-Review Workflow
+
+```dot
+digraph rereview {
+    rankdir=TB;
+    detect [label="Detect re-review" shape=diamond];
+    fetch [label="Fetch open threads" shape=box];
+    examine [label="Examine each thread\nagainst current code" shape=box];
+    resolve [label="Resolve addressed threads" shape=box];
+    review [label="Run normal review\non new changes" shape=box];
+
+    detect -> fetch [label="has prior review"];
+    detect -> review [label="first review"];
+    fetch -> examine;
+    examine -> resolve;
+    resolve -> review;
+}
+```
+
+### Step R1: Detect Re-Review
+
+A re-review is indicated when:
+- The user says "re-review", "follow-up review", or "check if comments are addressed"
+- The PR already has review threads from a prior review
+
+### Step R2: Fetch Open Review Threads
+
+Use the GraphQL API to list all unresolved review threads on the PR:
+
+```bash
+gh api graphql -f query='
+  query($owner: String!, $repo: String!, $pr: Int!) {
+    repository(owner: $owner, name: $repo) {
+      pullRequest(number: $pr) {
+        reviewThreads(first: 100) {
+          nodes {
+            id
+            isResolved
+            isOutdated
+            path
+            line
+            comments(first: 5) {
+              nodes {
+                body
+                author { login }
+                createdAt
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+' -f owner='{owner}' -f repo='{repo}' -F pr=PR_NUMBER
+```
+
+Filter to only **unresolved** threads (`isResolved: false`).
+
+### Step R3: Examine Each Thread Against Current Code
+
+For each unresolved thread:
+
+1. Read the **current content** of the file at the path indicated by the thread
+2. Read the **original review comment** to understand what was flagged
+3. Check if the issue described in the comment has been addressed:
+   - The problematic code was changed or removed
+   - The suggested fix (or equivalent) was applied
+   - The thread is marked `isOutdated` (the diff line no longer exists) — likely addressed
+
+**Judgment criteria:**
+- If the code at the flagged location clearly addresses the concern → **resolved**
+- If the thread is `isOutdated` and the surrounding code looks correct → **resolved**
+- If the issue persists unchanged → **unresolved** (leave open)
+- If partially addressed or addressed differently than suggested → use judgment; resolve if the concern is no longer valid
+
+### Step R4: Resolve Addressed Threads
+
+For each thread confirmed as addressed, resolve it via GraphQL:
+
+```bash
+gh api graphql -f query='
+  mutation($threadId: ID!) {
+    resolveReviewThread(input: { threadId: $threadId }) {
+      thread { isResolved }
+    }
+  }
+' -f threadId='THREAD_ID'
+```
+
+**Do not resolve threads that are still valid.** Only resolve threads where the underlying issue has been fixed.
+
+### Step R5: Report and Continue
+
+After resolving addressed threads, report what was resolved and what remains:
+
+```markdown
+## Re-Review: Comment Resolution
+
+### Resolved (N threads)
+- [file:line] — [brief description of original issue] ✓ Fixed
+  
+### Still Open (M threads)
+- [file:line] — [brief description] — still present / not fully addressed
+
+### Continuing with full review on new changes...
+```
+
+Then proceed with the normal review workflow (Steps 1–4) on any new changes since the last review.
 
 ## Confidence Scoring
 
