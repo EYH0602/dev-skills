@@ -134,7 +134,17 @@ Description of the issue.
 - [Strengths worth noting]
 ```
 
-If posting as a PR comment, use inline comments on specific lines where possible.
+## Posting the Review on GitHub
+
+When the review targets a GitHub PR, submit a formal review — not a plain comment.
+
+**Use inline comments** on specific lines of the diff for each finding. Include the confidence score and suggestion directly in the inline comment.
+
+**Submit a review verdict:**
+- **Approve** if no findings at confidence ≥75 remain after filtering
+- **Request Changes** if any critical (90-100) or important (75-89) findings exist
+
+Use your platform's PR review API (e.g., `gh api` for GitHub CLI, or equivalent) to post the review with inline comments and a verdict in a single review submission. Do not post findings as individual standalone comments.
 
 ## Confidence Scoring
 
