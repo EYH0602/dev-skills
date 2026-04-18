@@ -95,20 +95,44 @@ Locate the plan file. Check in order:
 If multiple candidates, ask the user which one. Read the plan fully -- you'll need to extract
 all tasks and provide their full text to subagents (subagents never read the plan file themselves).
 
-### Step 2: Check Review Status
+### Step 2: Require Engineering Review
 
-Scan the plan for evidence of review. Look for:
-- A `## GSTACK REVIEW REPORT` section (gstack's autoplan/review pipeline)
-- Review comments, approval markers, or sign-off sections
-- Git log showing the plan was reviewed: `git log --oneline -- <plan-file>`
+An engineering review must be cleared before implementation begins. Shipping unreviewed
+plans leads to wasted effort when the architecture is wrong -- it's much cheaper to catch
+design issues in review than to rewrite code after implementation.
 
-**If no review evidence found:** Warn the user: "This plan has no visible review markers.
-It's best to review plans before implementing (e.g., with engineering review, design review,
-or peer feedback). Proceed anyway?" If the user confirms, continue. If they don't respond,
-wait -- don't assume.
+**Check the plan for eng review status:**
 
-**If review evidence found:** Note it briefly and continue. Example: "Plan reviewed via
-/autoplan -- eng review CLEAR, CEO review CLEAR. Proceeding."
+1. **Gstack review report**: Look for a `## GSTACK REVIEW REPORT` section. Parse the
+   Eng Review row -- it must show status `CLEAR` (either `CLEAR (PLAN)` from `/plan-eng-review`
+   or `CLEAR (DIFF)` from `/review`). Any other status (missing, `--`, stale) means not cleared.
+
+2. **Other review markers**: Look for sections like `## Engineering Review`, `## Technical Review`,
+   or approval markers (`Approved by:`, `LGTM`, `Reviewed-by:`) that indicate an engineering-level
+   review has been done.
+
+3. **Git history**: `git log --oneline -- <plan-file>` -- look for commits with review-related
+   messages (e.g., "eng review", "plan-eng-review", "autoplan").
+
+**If eng review is CLEAR:** Note it briefly and continue. Example: "Eng review CLEAR
+(via /autoplan). Proceeding with implementation."
+
+**If eng review is NOT clear:** Stop and prompt the user:
+
+> This plan has no cleared engineering review. Engineering review catches architecture
+> and design issues before implementation -- fixing them in review is much cheaper than
+> rewriting code later.
+>
+> Options:
+> A) Run engineering review now (recommended -- e.g., `/plan-eng-review`)
+> B) Skip and implement anyway (I accept the risk)
+
+If the user chooses A, stop and let them run the review. They can invoke `/ship` again
+after the review clears. If the user chooses B, log their override and continue -- but
+note in the PR body that eng review was skipped.
+
+**Never silently skip this check.** The user must explicitly acknowledge if they're
+shipping without review.
 
 ### Step 3: Extract Tasks
 
@@ -238,6 +262,7 @@ Implements [plan-file-name](link-to-plan-file).
 ## Review Status
 
 <Paste review status from the plan if available, e.g., gstack review report.>
+<If eng review was skipped by user override, state: "Eng review: SKIPPED (user override)">
 
 ## Test Plan
 
