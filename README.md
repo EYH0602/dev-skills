@@ -73,14 +73,14 @@ pr-code-review/
 ![pr-code-review demo](./assets/pr-code-review.png)
 
 
-### ship
+### implement
 
 Execute an approved plan through subagent-driven development. Dispatches a fresh subagent per task with two-stage review (spec compliance, then code quality), commits each completed step for traceability, and opens a PR when done.
 
 Requires engineering review to be cleared before execution (see [Prerequisites](#prerequisites)).
 
 ```
-ship/
+implement/
 ├── SKILL.md                              # Orchestration workflow
 └── references/
     ├── implementer-prompt.md             # Subagent dispatch template
